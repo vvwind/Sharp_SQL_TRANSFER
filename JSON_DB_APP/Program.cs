@@ -1,13 +1,11 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
-using System.Web;
 using Newtonsoft.Json;
-
 using System.Data;
 using System.Data.SqlClient;
 using System.Configuration;
-using System.Text.Json;
+
 namespace JSON_DB_APP
 {
 
@@ -26,8 +24,8 @@ namespace JSON_DB_APP
         private static SqlConnection sqlConnection = null;
         static void Main(string[] args)
         {
-            Console.WriteLine($"Date: {result["abaddon"]}");
             Console.WriteLine("JSON DB");
+           
             sqlConnection = new SqlConnection(connectionString);
             sqlConnection.Open();
            
@@ -42,6 +40,7 @@ namespace JSON_DB_APP
                     Console.Write("Write smth \n");
                     command = Console.ReadLine();
 
+                  
 
                     if (command.ToLower().Equals("exit"))
                     {
@@ -59,17 +58,42 @@ namespace JSON_DB_APP
 
                     }
 
+
+                   
+                    if (command.ToLower().Equals("json")) //CONSTRUCTOR
+                    {
+                        foreach (KeyValuePair<string, object> kvp in result)
+
+                        {
+                            int leng = kvp.Value.ToString().Length;
+                            if (leng > 128)
+                            {
+                                string query = $"INSERT INTO hero_set_ (hero,sets) VALUES ({kvp.Key},{kvp.Value.ToString().Substring(0, 128) })";
+                                SqlCommand command_json = new SqlCommand(query, sqlConnection);
+                          
+                            }
+                            else
+                            {
+                                string query = $"INSERT INTO hero_set_ (hero,sets) VALUES ({kvp.Key},{kvp.Value.ToString().Substring(0, leng) })";
+                                SqlCommand command_json = new SqlCommand(query, sqlConnection);
+                              
+                            }
+                        }
+                        
+                    }
+
+
                     SqlCommand sqlCommand = new SqlCommand(command, sqlConnection);
 
                     switch (command.Split()[0].ToLower())
                     {
-
+                        
                         case "select":
 
                             sqlDataReader = sqlCommand.ExecuteReader();
                             while (sqlDataReader.Read())
                             {
-                                Console.WriteLine($"{sqlDataReader["Id"]} + {sqlDataReader["hero"]} + {sqlDataReader["set_name"]} + {sqlDataReader["set_items"]}");
+                                Console.WriteLine($"{sqlDataReader["Id"]} + {sqlDataReader["hero"]} + {sqlDataReader["sets"]}");
                                 Console.WriteLine(new string('-', 30));
 
                             }
